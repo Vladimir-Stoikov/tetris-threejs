@@ -1,10 +1,13 @@
+import { GameScene }from './components/GameScene'
 import './styles/App.css'
+
 
 function App() {
 
   return (
-    <h1>Tetris
-    </h1>
+    <div className='App'>
+      <GameScene />
+    </div>
   )
 }
 

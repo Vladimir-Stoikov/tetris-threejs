@@ -1,5 +1,5 @@
 export abstract class Tetromino {
-  protected shape: number[][];
+  public shape: number[][];
   protected rotationState: number = 0;
   protected rotationStates: number[][][];
 

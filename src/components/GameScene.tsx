@@ -1,28 +1,25 @@
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
 import { I_Tetromino } from '../game/entities/Tetromino'
 import { TetrominoMesh } from './TetrominoMesh'
 import { useGameLoop } from '../game/core/useGameLoop'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { OrbitControls } from '@react-three/drei'
 
 export const GameScene = () => {
 
-  const tetromino = new I_Tetromino();
+  const [piece, setPiece] = useState(new I_Tetromino());
+  const [position, setPosition] = useState({x: 0, y: 0, z: 0});
 
   useGameLoop(() => {});
 
-  function moveLeft() {
-    console.log('move left');
-  }
-
-  function moveRight() {
-    console.log('move left');
+  function move(dx: number, dy: number) {
+    setPosition(prev => ({x: prev.x + dx, y: prev.y + dy, z: prev.z}));
   }
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if(e.key === 'ArrowLeft') moveLeft();
-      if(e.key === 'ArrowRight') moveRight();
+    function handleKeyDown(e: KeyboardEvent) {
+      if(e.key === 'ArrowLeft') move(-1, 0);
+      if(e.key === 'ArrowRight') move(1, 0);
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -33,7 +30,7 @@ export const GameScene = () => {
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
       <OrbitControls />
-      <TetrominoMesh shape={tetromino.shape}/>
+      <TetrominoMesh shape={piece.shape} figurePosition={[position.x, position.y, position.z]}/>
     </Canvas>
   )
 }

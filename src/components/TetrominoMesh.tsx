@@ -1,6 +1,6 @@
 // import { Mesh, BoxGeometry, MeshStandardMaterial} from 'three'
 
-export const TetrominoMesh = ({ shape }: { shape: number[][] }) => {
+export const TetrominoMesh = ({ shape, figurePosition = [0, 0, 0] }: { shape: number[][], figurePosition?: [number, number, number] }) => {
   const blocks = shape.flatMap((row, y) => {
     return row.map((cell, x) => cell ? (
       <mesh position={[x, -y, 0]} key={`${x}-${y}`}>
@@ -10,5 +10,5 @@ export const TetrominoMesh = ({ shape }: { shape: number[][] }) => {
     ) : null)
   })
 
-  return <>{blocks}</>
+  return <group position={figurePosition}>{blocks}</group>
 }

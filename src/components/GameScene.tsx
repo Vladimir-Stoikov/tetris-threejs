@@ -1,16 +1,25 @@
 import { Canvas } from '@react-three/fiber'
-import { I_Tetromino } from '../game/entities/Tetromino'
+import { I_Tetromino, J_Tetromino, L_Tetromino, O_Tetromino, S_Tetromino, Z_Tetromino } from '../game/entities/Tetromino'
 import { TetrominoMesh } from './TetrominoMesh'
 import { useGameLoop } from '../game/core/useGameLoop'
 import { useEffect, useState } from 'react'
 import { OrbitControls } from '@react-three/drei'
 
+type TetrosType = I_Tetromino | O_Tetromino | L_Tetromino | J_Tetromino | S_Tetromino | Z_Tetromino;
+
 export const GameScene = () => {
 
-  const [piece, setPiece] = useState(new I_Tetromino());
+  const figures = [new I_Tetromino, new O_Tetromino, new L_Tetromino, new J_Tetromino, new S_Tetromino, new Z_Tetromino];
+
+  const [piece, setPiece] = useState<TetrosType>(new I_Tetromino());
   const [position, setPosition] = useState({x: 0, y: 0, z: 0});
 
   useGameLoop(() => {});
+
+  function generateTetro() {
+    const randomTetro = Math.ceil((Math.random()*figures.length) - 1);
+    setPiece(figures[randomTetro]);
+  }
 
   function move(dx: number, dy: number) {
     setPosition(prev => ({x: prev.x + dx, y: prev.y + dy, z: prev.z}));
@@ -20,6 +29,7 @@ export const GameScene = () => {
     function handleKeyDown(e: KeyboardEvent) {
       if(e.key === 'ArrowLeft') move(-1, 0);
       if(e.key === 'ArrowRight') move(1, 0);
+      if(e.key === 'ArrowUp') generateTetro();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);

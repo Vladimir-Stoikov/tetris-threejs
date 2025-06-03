@@ -14,7 +14,14 @@ export const GameScene = () => {
   const [piece, setPiece] = useState<TetrosType>(new I_Tetromino());
   const [position, setPosition] = useState({x: 0, y: 0, z: 0});
 
-  useGameLoop(() => {});
+  const [dropTime, setDropTime] = useState(Date.now());
+  
+  useGameLoop(() => {
+    if (Date.now() - dropTime > 1000) { // Каждую секунду
+      move(0, 1);
+      setDropTime(Date.now());
+    }
+  });
 
   function generateTetro() {
     const randomTetro = Math.ceil((Math.random()*figures.length) - 1);

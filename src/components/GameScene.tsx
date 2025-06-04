@@ -17,8 +17,8 @@ export const GameScene = () => {
   const [dropTime, setDropTime] = useState(Date.now());
   
   useGameLoop(() => {
-    if (Date.now() - dropTime > 1000) { // Каждую секунду
-      move(0, 1);
+    if (Date.now() - dropTime > 1000) { 
+      move(0, -1);
       setDropTime(Date.now());
     }
   });
@@ -32,11 +32,16 @@ export const GameScene = () => {
     setPosition(prev => ({x: prev.x + dx, y: prev.y + dy, z: prev.z}));
   }
 
+  function rotatePiece() {
+    console.log('rotate');
+  };
+
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if(e.key === 'ArrowLeft') move(-1, 0);
       if(e.key === 'ArrowRight') move(1, 0);
-      if(e.key === 'ArrowUp') generateTetro();
+      if(e.key === ' ') generateTetro();
+      if (e.key === 'ArrowUp') rotatePiece();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);

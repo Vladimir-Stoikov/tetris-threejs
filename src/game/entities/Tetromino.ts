@@ -37,6 +37,13 @@ export abstract class Tetromino {
     this.rotationState = 0;
     this.shape = this.rotationStates[0];
   }
+
+  public clone(): this {
+    const clone = new (this.constructor as any)();
+    clone.rotationState = this.rotationState;
+    clone.shape = this.shape.map(row => [...row]);
+    return clone;
+  }
 }
 
 export class I_Tetromino extends Tetromino {

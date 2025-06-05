@@ -18,7 +18,7 @@ export const GameScene = () => {
   
   useGameLoop(() => {
     if (Date.now() - dropTime > 1000) { 
-      move(0, -1);
+      move(0, -0.01);
       setDropTime(Date.now());
     }
   });
@@ -33,8 +33,10 @@ export const GameScene = () => {
   }
 
   function rotatePiece() {
-    console.log('rotate');
-  };
+    const newPiece = piece.clone();
+    newPiece.rotate();
+    setPiece(newPiece);
+  }
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {

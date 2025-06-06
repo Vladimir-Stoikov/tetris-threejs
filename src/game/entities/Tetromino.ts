@@ -39,7 +39,8 @@ export abstract class Tetromino {
   }
 
   public clone(): this {
-    const clone = new (this.constructor as any)();
+    const constructor = this.constructor as new () => this;
+    const clone = new constructor();
     clone.rotationState = this.rotationState;
     clone.shape = this.shape.map(row => [...row]);
     return clone;

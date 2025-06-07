@@ -2,7 +2,7 @@ import { Canvas } from '@react-three/fiber'
 import { I_Tetromino, J_Tetromino, L_Tetromino, O_Tetromino, S_Tetromino, Z_Tetromino } from '../game/entities/Tetromino'
 import { TetrominoMesh } from './TetrominoMesh'
 import { useGameLoop } from '../game/core/useGameLoop'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { OrbitControls } from '@react-three/drei'
 
 type TetrosType = I_Tetromino | O_Tetromino | L_Tetromino | J_Tetromino | S_Tetromino | Z_Tetromino;
@@ -23,20 +23,25 @@ export const GameScene = () => {
     }
   });
 
-  function generateTetro() {
-    const randomTetro = Math.ceil((Math.random()*figures.length) - 1);
-    setPiece(figures[randomTetro]);
-  }
-
-  function move(dx: number, dy: number) {
-    setPosition(prev => ({x: prev.x + dx, y: prev.y + dy, z: prev.z}));
-  }
-
-  function rotatePiece() {
-    const newPiece = piece.clone();
-    newPiece.rotate();
+  const generateTetro = useCallback(() => {
+    const randomTetro = Math.floor(Math.random() * figures.length);
+    const newPiece = figures[randomTetro];
+    newPiece.resetRotation(); 
     setPiece(newPiece);
-  }
+    setPosition({x: 0, y: 0, z: 0}); 
+  }, [figures]);
+
+  const move = useCallback((dx: number, dy: number) => {
+    setPosition(prev => ({x: prev.x + dx, y: prev.y + dy, z: prev.z}));
+  }, []);
+
+  const rotatePiece = useCallback(() => {
+    setPiece(prev => {
+      const newPiece = prev.clone();
+      newPiece.rotate();
+      return newPiece;
+    });
+  }, []);
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -47,14 +52,14 @@ export const GameScene = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [move, generateTetro, rotatePiece]); 
 
   return (
     <Canvas camera={{ position: [0, 0, 20], fov: 50}} >
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
       <OrbitControls />
-      <TetrominoMesh shape={piece.shape} figurePosition={[position.x, position.y, position.z]}/>
+      <TetrominoMesh shape={piece.getShape()} figurePosition={[position.x, position.y, position.z]}/>
     </Canvas>
   )
 }

@@ -4,6 +4,7 @@ import { TetrominoMesh } from './TetrominoMesh'
 import { useGameLoop } from '../game/core/useGameLoop'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { OrbitControls } from '@react-three/drei'
+import { GameField } from '../game/core/GameField'
 
 type TetrosType = I_Tetromino | O_Tetromino | L_Tetromino | J_Tetromino | S_Tetromino | Z_Tetromino;
 
@@ -22,7 +23,9 @@ export const GameScene = () => {
   const [position, setPosition] = useState({x: 0, y: 0, z: 0});
 
   const [dropTime, setDropTime] = useState(Date.now());
-  
+
+  const [gameField] = useState(() => new GameField(10, 20));
+
   useGameLoop(() => {
     if (Date.now() - dropTime > 1000) { 
       move(0, -0.01);
@@ -39,8 +42,16 @@ export const GameScene = () => {
   }, [figures]);
 
   const move = useCallback((dx: number, dy: number) => {
-    setPosition(prev => ({x: prev.x + dx, y: prev.y + dy, z: prev.z}));
-  }, []);
+    const newX = position.x + dx;
+    const newY = position.y + dy;
+    
+    if (!gameField.checkCollision(piece.getShape(), newX, newY)) {
+      setPosition({ x: newX, y: newY, z: 0 });
+    } else if (dy !== 0) {
+      gameField.mergePiece(piece.getShape(), position.x, position.y);
+      generateTetro();
+    }
+  }, [position, piece, gameField]);
 
   const rotatePiece = useCallback(() => {
     setPiece(prev => {

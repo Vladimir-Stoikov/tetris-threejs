@@ -5,6 +5,7 @@ import { useGameLoop } from '../game/core/useGameLoop'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { OrbitControls } from '@react-three/drei'
 import { GameField } from '../game/core/GameField'
+import { FieldMesh } from './FieldMesh'
 
 type TetrosType = I_Tetromino | O_Tetromino | L_Tetromino | J_Tetromino | S_Tetromino | Z_Tetromino;
 
@@ -74,6 +75,7 @@ export const GameScene = () => {
 
   return (
     <Canvas camera={{ position: [0, 0, 20], fov: 50}} >
+      <FieldMesh field={gameField.grid} />
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
       <OrbitControls />

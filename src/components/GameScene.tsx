@@ -68,10 +68,19 @@ export const GameScene = () => {
       if(e.key === 'ArrowRight') move(1, 0);
       if(e.key === ' ') generateTetro();
       if (e.key === 'ArrowUp') rotatePiece();
+      if (e.key === 'ArrowDown')  hardDrop();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [move, generateTetro, rotatePiece]); 
+
+  const hardDrop = useCallback(() => {
+    let newY = position.y;
+    while (!gameField.checkCollision(piece.getShape(), position.x, newY - 1)) {
+      newY--;
+    }
+    setPosition(prev => ({ ...prev, y: newY }));
+  }, [position, piece, gameField]);
 
   return (
     <Canvas camera={{ position: [0, 0, 20], fov: 50}} >

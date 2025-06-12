@@ -27,6 +27,14 @@ export const GameScene = () => {
 
   const [gameField] = useState(() => new GameField(10, 20));
 
+  const [score, setScore] = useState(0);
+
+// После mergePiece():
+const linesCleared = gameField.clearLines();
+if (linesCleared > 0) {
+  setScore(prev => prev + linesCleared * 100);
+}
+
   useGameLoop(() => {
     if (Date.now() - dropTime > 1000) { 
       move(0, -0.01);

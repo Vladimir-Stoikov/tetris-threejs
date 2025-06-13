@@ -29,7 +29,8 @@ export const GameScene = () => {
 
   const [score, setScore] = useState(0);
 
-// После mergePiece():
+  const [nextPiece, setNextPiece] = useState<TetrosType>(new I_Tetromino());
+
 const linesCleared = gameField.clearLines();
 if (linesCleared > 0) {
   setScore(prev => prev + linesCleared * 100);
@@ -81,6 +82,13 @@ if (linesCleared > 0) {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [move, generateTetro, rotatePiece]); 
+
+  const generateTetro = useCallback(() => {
+    setPiece(nextPiece);
+    const newNextPiece = figures[Math.floor(Math.random() * figures.length)].clone();
+    setNextPiece(newNextPiece);
+    setPosition({ x: 4, y: 19, z: 0 }); // Стартовая позиция
+  }, [nextPiece, figures]);
 
   const hardDrop = useCallback(() => {
     let newY = position.y;

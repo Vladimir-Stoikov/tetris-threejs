@@ -1,8 +1,12 @@
 export class GameField {
-  private grid: number[][];
+  private _grid: number[][];
 
   constructor(public width: number, public height: number) {
-    this.grid = Array(height).fill(0).map(() => Array(width).fill(0));
+    this._grid = Array.from({ length: height }, () => Array(width).fill(0));
+  }
+
+  get grid() {
+    return this._grid;
   }
 
   checkCollision(shape: number[][], x: number, y: number): boolean {
@@ -16,7 +20,7 @@ export class GameField {
             return true;
           }
 
-          if (newY >= 0 && this.grid[newY][newX] !== 0) {
+          if (newY >= 0 && this._grid[newY][newX] !== 0) {
             return true;
           }
         }
@@ -28,9 +32,9 @@ export class GameField {
   clearLines(): number {
     let linesCleared = 0;
     for (let y = this.height - 1; y >= 0; y--) {
-      if (this.grid[y].every(cell => cell !== 0)) {
-        this.grid.splice(y, 1);
-        this.grid.unshift(Array(this.width).fill(0));
+      if (this._grid[y].every(cell => cell !== 0)) {
+        this._grid.splice(y, 1);
+        this._grid.unshift(Array(this.width).fill(0));
         linesCleared++;
       }
     }
@@ -42,8 +46,9 @@ export class GameField {
       for (let col = 0; col < shape[row].length; col++) {
         if (shape[row][col] !== 0) {
           const newY = y + row;
-          if (newY >= 0) {
-            this.grid[newY][x + col] = shape[row][col];
+          const newX = x + col;
+          if (newY >= 0 && newY < this.height && newX >= 0 && newX < this.width) {
+            this._grid[newY][newX] = shape[row][col];
           }
         }
       }

@@ -83,13 +83,6 @@ if (linesCleared > 0) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [move, generateTetro, rotatePiece]); 
 
-  const generateTetro = useCallback(() => {
-    setPiece(nextPiece);
-    const newNextPiece = figures[Math.floor(Math.random() * figures.length)].clone();
-    setNextPiece(newNextPiece);
-    setPosition({ x: 4, y: 19, z: 0 }); // Стартовая позиция
-  }, [nextPiece, figures]);
-
   const hardDrop = useCallback(() => {
     let newY = position.y;
     while (!gameField.checkCollision(piece.getShape(), position.x, newY - 1)) {

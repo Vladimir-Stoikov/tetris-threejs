@@ -15,22 +15,6 @@
 - Keyboard controls (← → ↓ ↑)
 - Score system
 
-## 🏗 Project Structure
-
-```
-src/
-├── assets/               # 3D models/textures (если будут)
-├── components/           # React components
-│   ├── GameScene/        # Three.js canvas
-│   ├── UI/               # Score, controls
-│   └── TetrominoMesh.tsx # Renders tetrominoes
-├── game/                 # Core logic
-│   ├── core/             # Game state, collision
-│   └── entities/         # Tetromino classes
-├── hooks/                # useGameLoop, etc.
-└── styles/               # Global CSS
-```
-
 ## 📄 License
 
 MIT

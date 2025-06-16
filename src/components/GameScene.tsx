@@ -31,10 +31,6 @@ export const GameScene = () => {
 
   const [nextPiece, setNextPiece] = useState<TetrosType>(new I_Tetromino());
 
-const linesCleared = gameField.clearLines();
-if (linesCleared > 0) {
-  setScore(prev => prev + linesCleared * 100);
-}
 
   useGameLoop(() => {
     if (Date.now() - dropTime > 1000) { 
@@ -44,12 +40,16 @@ if (linesCleared > 0) {
   });
 
   const generateTetro = useCallback(() => {
-    const randomTetro = Math.floor(Math.random() * figures.length);
-    const newPiece = figures[randomTetro];
-    newPiece.resetRotation(); 
-    setPiece(newPiece);
-    setPosition({x: 0, y: 0, z: 0}); 
-  }, [figures]);
+    setPiece(nextPiece);
+    const newNextPiece = figures[Math.floor(Math.random() * figures.length)].clone();
+    setNextPiece(newNextPiece);
+    setPosition({ x: 4, y: 19, z: 0 });
+  }, [nextPiece, figures]);
+
+  const linesCleared = gameField.clearLines();
+    if (linesCleared > 0) {
+  setScore(prev => prev + linesCleared * 100);
+  }
 
   const move = useCallback((dx: number, dy: number) => {
     const newX = position.x + dx;

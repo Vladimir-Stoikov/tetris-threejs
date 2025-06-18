@@ -33,8 +33,15 @@ export const GameScene = () => {
   });
 
   const generateTetro = useCallback(() => {
-    setPiece(nextPiece);
+    const newPiece = nextPiece;
     const newNextPiece = figures[Math.floor(Math.random() * figures.length)].clone();
+
+    if (gameField.checkCollision(newPiece.getShape(), 4, 19)) {
+      setGameOver(true);
+      return;
+    }
+
+    setPiece(newPiece);
     setNextPiece(newNextPiece);
     setPosition({ x: 4, y: 19, z: 0 });
 
@@ -42,7 +49,7 @@ export const GameScene = () => {
     if (linesCleared > 0) {
       setScore(prev => prev + linesCleared * 100);
     }
-  }, [nextPiece, figures]);
+  }, [nextPiece, figures, gameField]);
 
   const move = useCallback(
     (dx: number, dy: number) => {

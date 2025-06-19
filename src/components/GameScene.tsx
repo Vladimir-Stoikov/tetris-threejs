@@ -6,7 +6,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { OrbitControls } from '@react-three/drei';
 import { GameField } from '../game/core/GameField';
 import { FieldMesh } from './FieldMesh';
-import { div } from 'three/tsl';
 
 type TetrosType = I_Tetromino | O_Tetromino | L_Tetromino | J_Tetromino | S_Tetromino | Z_Tetromino | T_Tetromino;
 
@@ -24,8 +23,10 @@ export const GameScene = () => {
   const [gameOver, setGameOver] = useState(false);
 
   const [nextPiece, setNextPiece] = useState<TetrosType>(new I_Tetromino());
+  const [isPaused, setIsPaused] = useState(false);
 
   useGameLoop(() => {
+    if (gameOver || isPaused) return;
     if (Date.now() - dropTime > 1000) {
       move(0, -0.01);
       setDropTime(Date.now());
@@ -81,6 +82,7 @@ export const GameScene = () => {
       if (e.key === ' ') generateTetro();
       if (e.key === 'ArrowUp') rotatePiece();
       if (e.key === 'ArrowDown') hardDrop();
+      if (e.key === 'p') setIsPaused(prev => !prev);
     }
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);

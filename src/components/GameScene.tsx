@@ -25,13 +25,22 @@ export const GameScene = () => {
   const [nextPiece, setNextPiece] = useState<TetrosType>(new I_Tetromino());
   const [isPaused, setIsPaused] = useState(false);
 
+  const [level, setLevel] = useState(1);
+  const [dropSpeed, setDropSpeed] = useState(1000);
+
   useGameLoop(() => {
     if (gameOver || isPaused) return;
     if (Date.now() - dropTime > 1000) {
       move(0, -0.01);
       setDropTime(Date.now());
     }
-  });
+    if (gameOver || isPaused) return;
+
+    if (Date.now() - dropTime > dropSpeed) {
+      move(0, -1);
+      setDropTime(Date.now());
+    }
+  }, [dropSpeed]);
 
   const generateTetro = useCallback(() => {
     const newPiece = nextPiece;
@@ -101,6 +110,7 @@ export const GameScene = () => {
       <div>
         Score: {score}
         {gameOver && <div style={{ color: 'red' }}>Game Over!</div>}
+        {isPaused && <div style={{ color: 'yellow', textAlign: 'center' }}>PAUSED</div>}
       </div>
 
       <Canvas camera={{ position: [0, 0, 20], fov: 50 }}>

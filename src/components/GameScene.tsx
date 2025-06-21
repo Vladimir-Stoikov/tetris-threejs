@@ -59,6 +59,12 @@ export const GameScene = () => {
     if (linesCleared > 0) {
       setScore(prev => prev + linesCleared * 100);
     }
+
+    const newLevel = Math.floor(score / 1000) + 1;
+    if (newLevel > level) {
+      setLevel(newLevel);
+      setDropSpeed(1000 / newLevel);
+    }
   }, [nextPiece, figures, gameField]);
 
   const move = useCallback(

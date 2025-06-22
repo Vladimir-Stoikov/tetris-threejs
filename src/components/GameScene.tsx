@@ -90,19 +90,6 @@ export const GameScene = () => {
     });
   }, []);
 
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'ArrowLeft') move(-1, 0);
-      if (e.key === 'ArrowRight') move(1, 0);
-      if (e.key === ' ') generateTetro();
-      if (e.key === 'ArrowUp') rotatePiece();
-      if (e.key === 'ArrowDown') hardDrop();
-      if (e.key === 'p') setIsPaused(prev => !prev);
-    }
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [move, generateTetro, rotatePiece]);
-
   const hardDrop = useCallback(() => {
     let newY = position.y;
     while (!gameField.checkCollision(piece.getShape(), position.x, newY - 1)) {
@@ -110,6 +97,48 @@ export const GameScene = () => {
     }
     setPosition(prev => ({ ...prev, y: newY }));
   }, [position, piece, gameField]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (gameOver && e.key !== 'r') return;
+
+      switch (e.key) {
+        case 'ArrowLeft':
+          move(-1, 0);
+          break;
+        case 'ArrowRight':
+          move(1, 0);
+          break;
+        case 'ArrowUp':
+          rotatePiece();
+          break;
+        case 'ArrowDown':
+          move(0, -1);
+          break;
+        case ' ':
+          hardDrop();
+          break;
+        case 'p':
+          setIsPaused(prev => !prev);
+          break;
+        case 'r':
+          if (gameOver) {
+            setGameOver(false);
+            setScore(0);
+            setLevel(1);
+            setDropSpeed(1000);
+            setPiece(figures[Math.floor(Math.random() * figures.length)]);
+            setNextPiece(figures[Math.floor(Math.random() * figures.length)]);
+            setPosition({ x: 4, y: 19, z: 0 });
+            gameField.grid.forEach(row => row.fill(0));
+          }
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [move, rotatePiece, hardDrop, gameOver, gameField, figures]);
 
   return (
     <div>

@@ -28,6 +28,19 @@ export const GameScene = () => {
   const [level, setLevel] = useState(1);
   const [dropSpeed, setDropSpeed] = useState(1000);
 
+  const [gameStarted, setGameStarted] = useState(false);
+
+  if (!gameStarted) {
+    return (
+      <Menu
+        onStart={() => {
+          setGameStarted(true);
+          restartGame();
+        }}
+      />
+    );
+  }
+
   useGameLoop(() => {
     if (gameOver || isPaused) return;
     if (Date.now() - dropTime > 1000) {

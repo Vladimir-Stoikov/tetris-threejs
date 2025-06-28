@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { OrbitControls } from '@react-three/drei';
 import { GameField } from '../game/core/GameField';
 import { FieldMesh } from './FieldMesh';
+import { Menu } from './Menu';
 
 type TetrosType = I_Tetromino | O_Tetromino | L_Tetromino | J_Tetromino | S_Tetromino | Z_Tetromino | T_Tetromino;
 
@@ -30,6 +31,17 @@ export const GameScene = () => {
 
   const [gameStarted, setGameStarted] = useState(false);
 
+  const restartGame = useCallback(() => {
+    setGameOver(false);
+    setScore(0);
+    setLevel(1);
+    setDropSpeed(1000);
+    setPiece(figures[Math.floor(Math.random() * figures.length)]);
+    setNextPiece(figures[Math.floor(Math.random() * figures.length)]);
+    setPosition({ x: 4, y: 19, z: 0 });
+    gameField.grid.forEach(row => row.fill(0));
+  }, [figures, gameField]);
+
   if (!gameStarted) {
     return (
       <Menu
@@ -42,11 +54,6 @@ export const GameScene = () => {
   }
 
   useGameLoop(() => {
-    if (gameOver || isPaused) return;
-    if (Date.now() - dropTime > 1000) {
-      move(0, -0.01);
-      setDropTime(Date.now());
-    }
     if (gameOver || isPaused) return;
 
     if (Date.now() - dropTime > dropSpeed) {
@@ -78,30 +85,36 @@ export const GameScene = () => {
       setLevel(newLevel);
       setDropSpeed(1000 / newLevel);
     }
-  }, [nextPiece, figures, gameField]);
+  }, [nextPiece, figures, gameField, score, level]);
 
   const move = useCallback(
     (dx: number, dy: number) => {
+      if (gameOver || isPaused) return;
+
       const newX = position.x + dx;
       const newY = position.y + dy;
 
       if (!gameField.checkCollision(piece.getShape(), newX, newY)) {
         setPosition({ x: newX, y: newY, z: 0 });
-      } else if (dy !== 0) {
+      } else if (dy < 0) {
+        // Изменяем условие на dy < 0
         gameField.mergePiece(piece.getShape(), position.x, position.y);
         generateTetro();
       }
     },
-    [position, piece, gameField]
+    [position, piece, gameField, generateTetro, gameOver, isPaused]
   );
 
   const rotatePiece = useCallback(() => {
-    setPiece(prev => {
-      const newPiece = prev.clone();
-      newPiece.rotate();
-      return newPiece;
-    });
-  }, []);
+    if (gameOver || isPaused) return;
+
+    const newPiece = piece.clone();
+    newPiece.rotate();
+
+    if (!gameField.checkCollision(newPiece.getShape(), position.x, position.y)) {
+      setPiece(newPiece);
+    }
+  }, [piece, position, gameField, gameOver, isPaused]);
 
   const hardDrop = useCallback(() => {
     let newY = position.y;
@@ -109,7 +122,9 @@ export const GameScene = () => {
       newY--;
     }
     setPosition(prev => ({ ...prev, y: newY }));
-  }, [position, piece, gameField]);
+    gameField.mergePiece(piece.getShape(), position.x, newY);
+    generateTetro();
+  }, [position, piece, gameField, generateTetro]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -151,7 +166,7 @@ export const GameScene = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [move, rotatePiece, hardDrop, gameOver, gameField, figures]);
+  }, [move, rotatePiece, hardDrop, gameOver, gameField, figures, restartGame]);
 
   return (
     <div>

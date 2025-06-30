@@ -60,7 +60,7 @@ export const GameScene = () => {
       move(0, -1);
       setDropTime(Date.now());
     }
-  }, [dropSpeed]);
+  }, [gameOver, isPaused, dropSpeed, dropTime, move]);
 
   const generateTetro = useCallback(() => {
     const newPiece = nextPiece;
@@ -97,12 +97,11 @@ export const GameScene = () => {
       if (!gameField.checkCollision(piece.getShape(), newX, newY)) {
         setPosition({ x: newX, y: newY, z: 0 });
       } else if (dy < 0) {
-        // Изменяем условие на dy < 0
         gameField.mergePiece(piece.getShape(), position.x, position.y);
         generateTetro();
       }
     },
-    [position, piece, gameField, generateTetro, gameOver, isPaused]
+    [gameOver, isPaused, position, piece, gameField, generateTetro]
   );
 
   const rotatePiece = useCallback(() => {

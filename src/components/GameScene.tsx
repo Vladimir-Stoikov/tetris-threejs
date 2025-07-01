@@ -10,11 +10,17 @@ import { Menu } from './Menu';
 
 type TetrosType = I_Tetromino | O_Tetromino | L_Tetromino | J_Tetromino | S_Tetromino | Z_Tetromino | T_Tetromino;
 
+type Position = {
+  x: number;
+  y: number;
+  z: number;
+};
+
 export const GameScene = () => {
   const figures = useMemo(() => [new I_Tetromino(), new O_Tetromino(), new L_Tetromino(), new J_Tetromino(), new S_Tetromino(), new Z_Tetromino(), new T_Tetromino()], []);
 
   const [piece, setPiece] = useState<TetrosType>(new I_Tetromino());
-  const [position, setPosition] = useState({ x: 4, y: 19, z: 0 });
+  const [position, setPosition] = useState<Position>({ x: 4, y: 19, z: 0 });
 
   const [dropTime, setDropTime] = useState(Date.now());
 
@@ -52,15 +58,6 @@ export const GameScene = () => {
       />
     );
   }
-
-  useGameLoop(() => {
-    if (gameOver || isPaused) return;
-
-    if (Date.now() - dropTime > dropSpeed) {
-      move(0, -1);
-      setDropTime(Date.now());
-    }
-  }, [gameOver, isPaused, dropSpeed, dropTime, move]);
 
   const generateTetro = useCallback(() => {
     const newPiece = nextPiece;
@@ -103,6 +100,15 @@ export const GameScene = () => {
     },
     [gameOver, isPaused, position, piece, gameField, generateTetro]
   );
+
+  useGameLoop(() => {
+    if (gameOver || isPaused) return;
+
+    if (Date.now() - dropTime > dropSpeed) {
+      move(0, -1);
+      setDropTime(Date.now());
+    }
+  }, [gameOver, isPaused, dropSpeed, dropTime, move]);
 
   const rotatePiece = useCallback(() => {
     if (gameOver || isPaused) return;

@@ -42,7 +42,7 @@ export const GameScene = () => {
     setScore(0);
     setLevel(1);
     setDropSpeed(1000);
-    setPiece(figures[Math.floor(Math.random() * figures.length)]);
+    setPiece(figures[Math.floor(Math.random() * figures.length)].clone());
     setNextPiece(figures[Math.floor(Math.random() * figures.length)]);
     setPosition({ x: 4, y: 19, z: 0 });
     gameField.grid.forEach(row => row.fill(0));
@@ -73,11 +73,13 @@ export const GameScene = () => {
     setPosition({ x: 4, y: 19, z: 0 });
 
     const linesCleared = gameField.clearLines();
+    let updatedScore = score;
     if (linesCleared > 0) {
-      setScore(prev => prev + linesCleared * 100);
+      updatedScore += linesCleared * 100;
+      setScore(updatedScore);
     }
 
-    const newLevel = Math.floor(score / 1000) + 1;
+    const newLevel = Math.floor(updatedScore / 1000) + 1;
     if (newLevel > level) {
       setLevel(newLevel);
       setDropSpeed(1000 / newLevel);

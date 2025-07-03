@@ -19,10 +19,9 @@ export abstract class Tetromino {
     return this.shape[0].length;
   }
 
-  public geHeight(): number {
+  public getHeight(): number {
     return this.shape.length;
   }
-
   public rotate(): void {
     this.rotationState = (this.rotationState + 1) % this.rotationStates.length;
     this.shape = this.rotationStates[this.rotationState];
@@ -43,6 +42,9 @@ export abstract class Tetromino {
     const clone = new constructor();
     clone.rotationState = this.rotationState;
     clone.shape = this.shape.map(row => [...row]);
+    clone.rotationStates = this.rotationStates.map(state =>
+      state.map(row => [...row])
+    );
     return clone;
   }
 }

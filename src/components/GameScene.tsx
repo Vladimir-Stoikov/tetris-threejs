@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber';
-import { I_Tetromino, J_Tetromino, L_Tetromino, O_Tetromino, S_Tetromino, T_Tetromino, Z_Tetromino } from '../game/entities/Tetromino';
+import { Tetromino } from '../game/entities/Tetromino';
 import { TetrominoMesh } from './TetrominoMesh';
 import { useGameLoop } from '../game/core/useGameLoop';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -8,7 +8,7 @@ import { GameField } from '../game/core/GameField';
 import { FieldMesh } from './FieldMesh';
 import { Menu } from './Menu';
 
-type TetrosType = I_Tetromino | O_Tetromino | L_Tetromino | J_Tetromino | S_Tetromino | Z_Tetromino | T_Tetromino;
+type TetrosType = Tetromino;
 
 type Position = {
   x: number;
@@ -17,10 +17,10 @@ type Position = {
 };
 
 export const GameScene = () => {
-  const figures = useMemo(() => [new I_Tetromino(), new O_Tetromino(), new L_Tetromino(), new J_Tetromino(), new S_Tetromino(), new Z_Tetromino(), new T_Tetromino()], []);
+  const figures = useMemo(() => [Tetromino.I(), Tetromino.O(), Tetromino.L(), Tetromino.J(), Tetromino.S(), Tetromino.Z(), Tetromino.T()], []);
 
-  const [piece, setPiece] = useState<TetrosType>(new I_Tetromino());
-  const [position, setPosition] = useState<Position>({ x: 4, y: 19, z: 0 });
+  const [piece, setPiece] = useState<TetrosType>(Tetromino.I());
+  const [nextPiece, setNextPiece] = useState<TetrosType>(Tetromino.I());
 
   const [dropTime, setDropTime] = useState(Date.now());
 
@@ -29,7 +29,6 @@ export const GameScene = () => {
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
 
-  const [nextPiece, setNextPiece] = useState<TetrosType>(new I_Tetromino());
   const [isPaused, setIsPaused] = useState(false);
 
   const [level, setLevel] = useState(1);
@@ -43,7 +42,7 @@ export const GameScene = () => {
     setLevel(1);
     setDropSpeed(1000);
     setPiece(figures[Math.floor(Math.random() * figures.length)].clone());
-    setNextPiece(figures[Math.floor(Math.random() * figures.length)]);
+    setNextPiece(figures[Math.floor(Math.random() * figures.length)].clone());
     setPosition({ x: 4, y: 19, z: 0 });
     gameField.grid.forEach(row => row.fill(0));
   }, [figures, gameField]);
@@ -162,8 +161,8 @@ export const GameScene = () => {
             setScore(0);
             setLevel(1);
             setDropSpeed(1000);
-            setPiece(figures[Math.floor(Math.random() * figures.length)]);
-            setNextPiece(figures[Math.floor(Math.random() * figures.length)]);
+            setPiece(figures[Math.floor(Math.random() * figures.length)].clone());
+            setNextPiece(figures[Math.floor(Math.random() * figures.length)].clone());
             setPosition({ x: 4, y: 19, z: 0 });
             gameField.grid.forEach(row => row.fill(0));
           }

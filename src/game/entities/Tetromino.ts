@@ -1,66 +1,45 @@
-export abstract class Tetromino {
-  public shape: number[][];
-  protected rotationState: number = 0;
-  protected rotationStates: number[][][];
+export class Tetromino {
+  protected rotationState = 0;
 
-  constructor() {
-    this.shape = this.generateShape();
-    this.rotationStates = this.generateRotationStates();
+  constructor(
+    protected rotationStates: number[][][]
+  ) {}
+
+  public get shape(): number[][] {
+    return this.rotationStates[this.rotationState];
   }
 
-  protected abstract generateShape(): number[][];
-  protected abstract generateRotationStates(): number[][][];
-
-  public getShape(): number[][] {
-    return this.shape;
+  public get width(): number {
+    return this.shape[0]?.length ?? 0;
   }
 
-  public getWidth(): number {
-    return this.shape[0].length;
-  }
-
-  public getHeight(): number {
+  public get height(): number {
     return this.shape.length;
   }
+
   public rotate(): void {
     this.rotationState = (this.rotationState + 1) % this.rotationStates.length;
-    this.shape = this.rotationStates[this.rotationState];
   }
 
   public getNextRotation(): number[][] {
-    const nextState = (this.rotationState + 1) % this.rotationStates.length;
-    return this.rotationStates[nextState];
+    const next = (this.rotationState + 1) % this.rotationStates.length;
+    return this.rotationStates[next];
   }
 
   public resetRotation(): void {
     this.rotationState = 0;
-    this.shape = this.rotationStates[0];
   }
 
-  public clone(): this {
-    const constructor = this.constructor as new () => this;
-    const clone = new constructor();
-    clone.rotationState = this.rotationState;
-    clone.shape = this.shape.map(row => [...row]);
-    clone.rotationStates = this.rotationStates.map(state =>
-      state.map(row => [...row])
+  public clone(): Tetromino {
+    return new Tetromino(
+      this.rotationStates.map(state =>
+        state.map(row => [...row])
+      )
     );
-    return clone;
-  }
-}
-
-export class I_Tetromino extends Tetromino {
-  protected generateShape(): number[][] {
-    return [
-      [0, 0, 0, 0],
-      [1, 1, 1, 1],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ];
   }
 
-  protected generateRotationStates(): number[][][] {
-    return [
+  static I(): Tetromino {
+    const states = [
       [
         [0, 0, 0, 0],
         [1, 1, 1, 1],
@@ -72,219 +51,122 @@ export class I_Tetromino extends Tetromino {
         [0, 0, 1, 0],
         [0, 0, 1, 0],
         [0, 0, 1, 0]
-      ],
-      [
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-        [1, 1, 1, 1],
-        [0, 0, 0, 0]
-      ],
-      [
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 1, 0, 0]
       ]
     ];
-  }
-}
-
-export class O_Tetromino extends Tetromino {
-
-  protected generateShape(): number[][] {
-    return [
-      [0, 1, 1, 0],
-      [0, 1, 1, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-    ]
+    return new Tetromino(states);
   }
 
-  protected generateRotationStates(): number[][][] {
-    return [
+  static O(): Tetromino {
+    const state = [
+      [1, 1],
+      [1, 1]
+    ];
+    return new Tetromino([state]); 
+  }
+
+  static T(): Tetromino {
+    return new Tetromino([
       [
-        [0, 1, 1, 0],
-        [0, 1, 1, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
+        [0, 1, 0],
+        [1, 1, 1],
+        [0, 0, 0]
+      ],
+      [
+        [0, 1, 0],
+        [0, 1, 1],
+        [0, 1, 0]
+      ],
+      [
+        [0, 0, 0],
+        [1, 1, 1],
+        [0, 1, 0]
+      ],
+      [
+        [0, 1, 0],
+        [1, 1, 0],
+        [0, 1, 0]
       ]
-    ]
+    ]);
   }
 
-}
-
-export class T_Tetromino extends Tetromino {
-  protected generateShape(): number[][] {
-    return [
-      [0, 1, 0, 0],
-      [1, 1, 1, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-    ]
-  }
-
-  protected generateRotationStates(): number[][][] {
-    return [
+  static L(): Tetromino {
+    return new Tetromino([
       [
-        [0, 1, 0, 0],
-        [1, 1, 1, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
+        [1, 0],
+        [1, 0],
+        [1, 1]
       ],
       [
-        [0, 1, 0, 0],
-        [0, 1, 1, 0],
-        [0, 1, 0, 0],
-        [0, 0, 0, 0],
+        [0, 0, 1],
+        [1, 1, 1],
+        [0, 0, 0]
       ],
       [
-        [0, 0, 0, 0],
-        [1, 1, 1, 0],
-        [0, 1, 0, 0],
-        [0, 0, 0, 0],
+        [1, 1],
+        [0, 1],
+        [0, 1]
       ],
       [
-        [0, 1, 0, 0],
-        [1, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 0, 0, 0],
+        [0, 0, 0],
+        [1, 1, 1],
+        [1, 0, 0]
       ]
-    ]
-  }
-}
-
-export class L_Tetromino extends Tetromino {
-  protected generateShape(): number[][] {
-    return [
-      [0, 1, 0, 0],
-      [0, 1, 0, 0],
-      [0, 1, 1, 0],
-      [0, 0, 0, 0],
-    ]
+    ]);
   }
 
-  protected generateRotationStates(): number[][][] {
-    return [
+  static J(): Tetromino {
+    return new Tetromino([
       [
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 1, 1, 0],
-        [0, 0, 0, 0],
+        [0, 1],
+        [0, 1],
+        [1, 1]
       ],
       [
-        [0, 0, 0, 0],
-        [1, 1, 1, 0],
-        [1, 0, 0, 0],
-        [0, 0, 0, 0],
+        [1, 0, 0],
+        [1, 1, 1],
+        [0, 0, 0]
       ],
       [
-        [1, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 0, 0, 0],
+        [1, 1],
+        [1, 0],
+        [1, 0]
       ],
       [
-        [0, 0, 1, 0],
-        [1, 1, 1, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
+        [0, 0, 0],
+        [1, 1, 1],
+        [0, 0, 1]
       ]
-    ]
+    ]);
   }
-}
-
-export class J_Tetromino extends Tetromino {
-  protected generateShape(): number[][] {
-    return [
-      [0, 1, 0, 0],
-      [0, 1, 0, 0],
-      [1, 1, 0, 0],
-      [0, 0, 0, 0],
-    ]
-  }
-
-  protected generateRotationStates(): number[][][] {
-    return [
+  
+  static S(): Tetromino {
+    return new Tetromino([
       [
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [1, 1, 0, 0],
-        [0, 0, 0, 0],
+        [0, 1, 1],
+        [1, 1, 0],
+        [0, 0, 0]
       ],
       [
-        [1, 0, 0, 0],
-        [1, 1, 1, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-      ],
-      [
-        [0, 1, 1, 0],
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 0, 0, 0],
-      ],
-      [
-        [0, 0, 0, 0],
-        [1, 1, 1, 0],
-        [0, 0, 1, 0],
-        [0, 0, 0, 0],
-      ],
-    ]
-  }
-}
-
-export class S_Tetromino extends Tetromino {
-  protected generateShape(): number[][] {
-    return [
-      [0, 0, 0, 0],
-      [0, 1, 1, 0],
-      [1, 1, 0, 0],
-      [0, 0, 0, 0],
-    ]
-  }
-
-  protected generateRotationStates(): number[][][] {
-    return [
-      [
-        [0, 0, 0, 0],
-        [0, 1, 1, 0],
-        [1, 1, 0, 0],
-        [0, 0, 0, 0],
-      ],
-      [
-        [0, 1, 0, 0],
-        [0, 1, 1, 0],
-        [0, 0, 1, 0],
-        [0, 0, 0, 0],
+        [1, 0, 0],
+        [1, 1, 0],
+        [0, 1, 0]
       ]
-    ]
+    ]);
   }
-}
-
-export class Z_Tetromino extends Tetromino {
-  protected generateShape(): number[][] {
-    return [
-      [0, 0, 0, 0],
-      [1, 1, 0, 0],
-      [0, 1, 1, 0],
-      [0, 0, 0, 0],
-    ]
-  }
-
-  protected generateRotationStates(): number[][][] {
-    return [
+  
+  static Z(): Tetromino {
+    return new Tetromino([
       [
-        [0, 0, 0, 0],
-        [1, 1, 0, 0],
-        [0, 1, 1, 0],
-        [0, 0, 0, 0],
+        [1, 1, 0],
+        [0, 1, 1],
+        [0, 0, 0]
       ],
       [
-        [0, 0, 1, 0],
-        [0, 1, 1, 0],
-        [0, 1, 0, 0],
-        [0, 0, 0, 0],
+        [0, 1, 0],
+        [1, 1, 0],
+        [1, 0, 0]
       ]
-    ]
+    ]);
   }
+  
 }

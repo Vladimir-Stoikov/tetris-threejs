@@ -35,6 +35,7 @@ export const GameScene = () => {
   const [dropSpeed, setDropSpeed] = useState(1000);
 
   const [gameStarted, setGameStarted] = useState(false);
+  const [position, setPosition] = useState<Position>({ x: 4, y: 19, z: 0 });
 
   const restartGame = useCallback(() => {
     setGameOver(false);
@@ -47,16 +48,34 @@ export const GameScene = () => {
     gameField.grid.forEach(row => row.fill(0));
   }, [figures, gameField]);
 
-  if (!gameStarted) {
-    return (
-      <Menu
-        onStart={() => {
-          setGameStarted(true);
-          restartGame();
-        }}
-      />
-    );
-  }
+  return (
+    <>
+      {!gameStarted ? (
+        <Menu
+          onStart={() => {
+            setGameStarted(true);
+            restartGame();
+          }}
+        />
+      ) : (
+        <>
+          <div>
+            Score: {score}
+            {gameOver && <div style={{ color: 'red' }}>Game Over!</div>}
+            {isPaused && <div style={{ color: 'yellow', textAlign: 'center' }}>PAUSED</div>}
+          </div>
+
+          <Canvas camera={{ position: [0, 0, 20], fov: 50 }}>
+            <FieldMesh field={gameField.grid} />
+            <ambientLight intensity={0.5} />
+            <pointLight position={[10, 10, 10]} />
+            <OrbitControls />
+            <TetrominoMesh shape={piece.getShape()} figurePosition={[position.x, position.y, position.z]} />
+          </Canvas>
+        </>
+      )}
+    </>
+  );
 
   const generateTetro = useCallback(() => {
     const newPiece = nextPiece;

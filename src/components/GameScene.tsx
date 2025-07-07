@@ -8,8 +8,6 @@ import { GameField } from '../game/core/GameField';
 import { FieldMesh } from './FieldMesh';
 import { Menu } from './Menu';
 
-type TetrosType = Tetromino;
-
 type Position = {
   x: number;
   y: number;
@@ -19,21 +17,15 @@ type Position = {
 export const GameScene = () => {
   const figures = useMemo(() => [Tetromino.I(), Tetromino.O(), Tetromino.L(), Tetromino.J(), Tetromino.S(), Tetromino.Z(), Tetromino.T()], []);
 
-  const [piece, setPiece] = useState<TetrosType>(Tetromino.I());
-  const [nextPiece, setNextPiece] = useState<TetrosType>(Tetromino.I());
-
+  const [piece, setPiece] = useState<Tetromino>(Tetromino.I());
+  const [nextPiece, setNextPiece] = useState<Tetromino>(Tetromino.I());
   const [dropTime, setDropTime] = useState(Date.now());
-
   const [gameField] = useState(() => new GameField(10, 20));
-
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
-
   const [isPaused, setIsPaused] = useState(false);
-
   const [level, setLevel] = useState(1);
   const [dropSpeed, setDropSpeed] = useState(1000);
-
   const [gameStarted, setGameStarted] = useState(false);
   const [position, setPosition] = useState<Position>({ x: 4, y: 19, z: 0 });
 
@@ -47,35 +39,6 @@ export const GameScene = () => {
     setPosition({ x: 4, y: 19, z: 0 });
     gameField.grid.forEach(row => row.fill(0));
   }, [figures, gameField]);
-
-  return (
-    <>
-      {!gameStarted ? (
-        <Menu
-          onStart={() => {
-            setGameStarted(true);
-            restartGame();
-          }}
-        />
-      ) : (
-        <>
-          <div>
-            Score: {score}
-            {gameOver && <div style={{ color: 'red' }}>Game Over!</div>}
-            {isPaused && <div style={{ color: 'yellow', textAlign: 'center' }}>PAUSED</div>}
-          </div>
-
-          <Canvas camera={{ position: [0, 0, 20], fov: 50 }}>
-            <FieldMesh field={gameField.grid} />
-            <ambientLight intensity={0.5} />
-            <pointLight position={[10, 10, 10]} />
-            <OrbitControls />
-            <TetrominoMesh shape={piece.getShape()} figurePosition={[position.x, position.y, position.z]} />
-          </Canvas>
-        </>
-      )}
-    </>
-  );
 
   const generateTetro = useCallback(() => {
     const newPiece = nextPiece;
@@ -121,15 +84,6 @@ export const GameScene = () => {
     [gameOver, isPaused, position, piece, gameField, generateTetro]
   );
 
-  useGameLoop(() => {
-    if (gameOver || isPaused) return;
-
-    if (Date.now() - dropTime > dropSpeed) {
-      move(0, -1);
-      setDropTime(Date.now());
-    }
-  }, [gameOver, isPaused, dropSpeed, dropTime, move]);
-
   const rotatePiece = useCallback(() => {
     if (gameOver || isPaused) return;
 
@@ -150,6 +104,15 @@ export const GameScene = () => {
     gameField.mergePiece(piece.getShape(), position.x, newY);
     generateTetro();
   }, [position, piece, gameField, generateTetro]);
+
+  useGameLoop(() => {
+    if (gameOver || isPaused) return;
+
+    if (Date.now() - dropTime > dropSpeed) {
+      move(0, -1);
+      setDropTime(Date.now());
+    }
+  }, [gameOver, isPaused, dropSpeed, dropTime, move]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -175,24 +138,28 @@ export const GameScene = () => {
           setIsPaused(prev => !prev);
           break;
         case 'r':
-          if (gameOver) {
-            setGameOver(false);
-            setScore(0);
-            setLevel(1);
-            setDropSpeed(1000);
-            setPiece(figures[Math.floor(Math.random() * figures.length)].clone());
-            setNextPiece(figures[Math.floor(Math.random() * figures.length)].clone());
-            setPosition({ x: 4, y: 19, z: 0 });
-            gameField.grid.forEach(row => row.fill(0));
-          }
+          if (gameOver) restartGame();
           break;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [move, rotatePiece, hardDrop, gameOver, gameField, figures, restartGame]);
+  }, [move, rotatePiece, hardDrop, gameOver, restartGame]);
 
+  // Условный рендеринг: меню или игровая сцена
+  if (!gameStarted) {
+    return (
+      <Menu
+        onStart={() => {
+          setGameStarted(true);
+          restartGame();
+        }}
+      />
+    );
+  }
+
+  // Основной рендер сцены
   return (
     <div>
       <div>

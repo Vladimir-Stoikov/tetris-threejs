@@ -44,7 +44,7 @@ export const GameScene = () => {
     const newPiece = nextPiece;
     const newNextPiece = figures[Math.floor(Math.random() * figures.length)].clone();
 
-    if (gameField.checkCollision(newPiece.getShape(), 4, 19)) {
+    if (gameField.checkCollision(newPiece.shape, 4, 19)) {
       setGameOver(true);
       return;
     }
@@ -74,10 +74,10 @@ export const GameScene = () => {
       const newX = position.x + dx;
       const newY = position.y + dy;
 
-      if (!gameField.checkCollision(piece.getShape(), newX, newY)) {
+      if (!gameField.checkCollision(piece.shape, newX, newY)) {
         setPosition({ x: newX, y: newY, z: 0 });
       } else if (dy < 0) {
-        gameField.mergePiece(piece.getShape(), position.x, position.y);
+        gameField.mergePiece(piece.shape, position.x, position.y);
         generateTetro();
       }
     },
@@ -90,18 +90,18 @@ export const GameScene = () => {
     const newPiece = piece.clone();
     newPiece.rotate();
 
-    if (!gameField.checkCollision(newPiece.getShape(), position.x, position.y)) {
+    if (!gameField.checkCollision(newPiece.shape, position.x, position.y)) {
       setPiece(newPiece);
     }
   }, [piece, position, gameField, gameOver, isPaused]);
 
   const hardDrop = useCallback(() => {
     let newY = position.y;
-    while (!gameField.checkCollision(piece.getShape(), position.x, newY - 1)) {
+    while (!gameField.checkCollision(piece.shape, position.x, newY - 1)) {
       newY--;
     }
     setPosition(prev => ({ ...prev, y: newY }));
-    gameField.mergePiece(piece.getShape(), position.x, newY);
+    gameField.mergePiece(piece.shape, position.x, newY);
     generateTetro();
   }, [position, piece, gameField, generateTetro]);
 
@@ -147,7 +147,6 @@ export const GameScene = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [move, rotatePiece, hardDrop, gameOver, restartGame]);
 
-  // Условный рендеринг: меню или игровая сцена
   if (!gameStarted) {
     return (
       <Menu
@@ -159,7 +158,6 @@ export const GameScene = () => {
     );
   }
 
-  // Основной рендер сцены
   return (
     <div>
       <div>
@@ -173,7 +171,7 @@ export const GameScene = () => {
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} />
         <OrbitControls />
-        <TetrominoMesh shape={piece.getShape()} figurePosition={[position.x, position.y, position.z]} />
+        <TetrominoMesh shape={piece.shape} figurePosition={[position.x, position.y, position.z]} />
       </Canvas>
     </div>
   );

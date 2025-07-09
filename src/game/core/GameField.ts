@@ -10,6 +10,7 @@ export class GameField {
   }
 
   checkCollision(shape: number[][], x: number, y: number): boolean {
+    if (!shape || shape.length === 0) return false;
     for (let row = 0; row < shape.length; row++) {
       for (let col = 0; col < shape[row].length; col++) {
         if (shape[row][col] !== 0) {
@@ -42,6 +43,7 @@ export class GameField {
   }
 
   mergePiece(shape: number[][], x: number, y: number): void {
+    if (!shape || shape.length === 0) return;
     for (let row = 0; row < shape.length; row++) {
       for (let col = 0; col < shape[row].length; col++) {
         if (shape[row][col] !== 0) {

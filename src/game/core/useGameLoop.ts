@@ -1,12 +1,11 @@
 import { useEffect, useRef } from "react";
 
-export const useGameLoop = (callback: () => void) => {
-  const savedCallback = useRef<() => void>();
-
+export const useGameLoop = (callback: () => void, deps: any[] = []) => {
+  const savedCallback = useRef(callback);
 
   useEffect(() => {
     savedCallback.current = callback;
-  });
+  }, [callback, ...deps]);
 
   useEffect(() => {
     let frameId: number;
